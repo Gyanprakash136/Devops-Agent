@@ -44,9 +44,10 @@ The `Action` Pydantic model requires the agent to specify the server and the act
 ```json
 {
   "server_id": "i-01234abcd",
-  "action_type": "terminate" // Options: "terminate", "downsize", "none"
+  "action_type": "terminate"
 }
 ```
+*Options for `action_type`: "terminate", "downsize", "none"*
 
 ## Tasks & Grading Logic
 
@@ -62,7 +63,7 @@ The `Action` Pydantic model requires the agent to specify the server and the act
 - **Objective:** Optimize a mixed cluster to get total monthly cost under $500 while maintaining a minimum total compute capacity (10 vCPUs).
 - **Grader:** Score from 0.0 to 1.0 based on how well the budget is met without dropping below standard compute minimums.
 
-## Baseline Scores (Mock Agent)
+## Baseline Scores
 
 | Task | Score |
 | :--- | :--- |
@@ -79,9 +80,9 @@ The `Action` Pydantic model requires the agent to specify the server and the act
    pip install -r requirements.txt
    ```
 
-2. **Run Env**:
+2. **Run Environment & Dashboard**:
    ```bash
-   uvicorn app:app --host 0.0.0.0 --port 7860
+   uvicorn server.app:app --host 0.0.0.0 --port 7860
    ```
 
 3. **Run Baseline Inference**:
@@ -90,7 +91,7 @@ The `Action` Pydantic model requires the agent to specify the server and the act
    python inference.py
    ```
 
-## Deployment to Hugging Face
+## Deployment
+This project is ready for deployment as a Docker Space on Hugging Face.
 
-This project is ready for deployment as a Docker Space. Ensure the `openenv` tag is present in the Space settings.
 

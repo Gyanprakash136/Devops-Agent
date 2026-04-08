@@ -3,3 +3,5 @@ uvicorn
 pydantic
 openai
 openenv-core
+gradio
+matplotlib

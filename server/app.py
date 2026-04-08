@@ -1,12 +1,18 @@
 import uvicorn
+import gradio as gr
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from .environment import CloudOptimizerEnv, Action, Observation, Reward
+from .ui import create_ui
 
 app = FastAPI(title="OpenEnv Cloud Infrastructure Cost Optimizer")
 
 # Global dict to store envs by task name (for simple statefulness if needed)
 envs = {}
+
+# Initialize and mount Gradio UI
+ui = create_ui(envs)
+app = gr.mount_gradio_app(app, ui, path="/")
 
 def get_env(task_name: str) -> CloudOptimizerEnv:
     if task_name not in envs:
