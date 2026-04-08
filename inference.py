@@ -154,7 +154,7 @@ def run_task(task_name: str, client: OpenAI):
         success_str = "true" if success else "false"
         rewards_str = ",".join(f"{r:.2f}" for r in rewards_history) if rewards_history else "0.00"
         
-        final_score = max(0.0, min(1.0, final_score))
+        final_score = max(0.01, min(0.99, final_score))
         print(f"[END] success={success_str} steps={step_count} score={final_score:.2f} rewards={rewards_str}")
 
 

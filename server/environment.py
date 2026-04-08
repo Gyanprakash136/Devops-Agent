@@ -169,10 +169,11 @@ class CloudOptimizerEnv:
         
         # Penalize killing normal servers heavily
         if any(n.status == "terminated" for n in normals):
-            return 0.0
+            return 0.01
             
         terminated_zombies = sum(1 for z in zombies if z.status == "terminated")
-        return float(terminated_zombies) / max(1, len(zombies_id))
+        score = float(terminated_zombies) / max(1, len(zombies_id))
+        return min(max(score, 0.01), 0.99)
 
     def _grade_medium(self) -> float:
         # Grade in [0, 1]
@@ -184,14 +185,15 @@ class CloudOptimizerEnv:
         
         # Penalize touching normal servers
         if any(n.status == "terminated" or n.instance_type != next(i.instance_type for i in self.initial_state if i.server_id == n.server_id) for n in normals):
-            return 0.0
+            return 0.01
             
         # Penalize terminating underutilized instead of downsizing
         if any(u.status == "terminated" for u in under):
-            return 0.0
+            return 0.01
             
         downsized = sum(1 for u in under if u.instance_type != next(i.instance_type for i in self.initial_state if i.server_id == u.server_id))
-        return float(downsized) / max(1, len(under_id))
+        score = float(downsized) / max(1, len(under_id))
+        return min(max(score, 0.01), 0.99)
 
     def _grade_hard(self) -> float:
         # Grade in [0.0, 1.0]
@@ -201,23 +203,24 @@ class CloudOptimizerEnv:
         high_cpu = [s for s in self.servers if s.server_id in high_cpu_ids]
         
         if any(h.status == "terminated" for h in high_cpu):
-            return 0.0
+            return 0.01
             
         total_cost = sum(s.cost_per_month for s in self.servers)
         total_vcpu = sum(s.vcpu for s in self.servers)
         
         if total_vcpu < self.min_capacity:
-            return 0.0
+            return 0.01
             
         if total_cost <= self.budget:
             # Met budget and capacity, maximum score!
-            return 1.0
+            return 0.99
             
         initial_cost = sum(s.cost_per_month for s in self.initial_state)
         # Cost reduced but not below budget
         savings = max(0, initial_cost - total_cost)
         max_possible_savings = initial_cost - self.budget
         if max_possible_savings <= 0:
-            return 1.0
+            return 0.99
             
-        return min(0.9, float(savings) / max_possible_savings)
+        score = float(savings) / max_possible_savings
+        return min(max(score, 0.01), 0.99)

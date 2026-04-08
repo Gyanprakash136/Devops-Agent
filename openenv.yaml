@@ -13,8 +13,8 @@ tasks:
     description: "Optimize a mixed cluster to get total monthly cost under budget while maintaining minimum compute capacity."
     reward_range: [0.0, 1.0]
 models:
-  observation: "environment:Observation"
-  action: "environment:Action"
-  reward: "environment:Reward"
+  observation: "server.environment:Observation"
+  action: "server.environment:Action"
+  reward: "server.environment:Reward"
 entrypoint: "server.app:app"
 version: "1.0.0"
