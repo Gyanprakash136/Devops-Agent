@@ -16,9 +16,9 @@ tags:
   
   <p>
     <img src="https://img.shields.io/badge/OpenEnv-Compatible-green.svg" alt="OpenEnv Compatible">
+    <img src="https://img.shields.io/badge/Phase--2-Validated-blue.svg" alt="Phase 2 Validated">
     <img src="https://img.shields.io/badge/Framework-FastAPI-009688.svg" alt="FastAPI">
     <img src="https://img.shields.io/badge/Frontend-Gradio-ff5200.svg" alt="Gradio">
-    <img src="https://img.shields.io/badge/License-Apache--2.0-blue.svg" alt="License">
   </p>
 </div>
 
@@ -26,83 +26,73 @@ tags:
 
 ## 📖 Overview
 
-The **Cloud Infrastructure Cost Optimizer** is a real-world simulation environment designed for the OpenEnv Hackathon. It challenges AI agents to take on the role of a **SRE/DevOps Engineer** managing a large-scale cloud cluster. 
+The **Cloud Infrastructure Cost Optimizer** is a production-grade simulation environment built for the Meta x Scaler Hackathon. It puts an AI agent in the driver's seat of a cloud fleet, challenging it to optimize monthly spending while maintaining mission-critical compute capacity.
 
-In modern infrastructure, "Zombie" servers and over-provisioned instances cost companies billions. This environment provides a platform to train agents that can autonomously optimize infrastructure costs while ensuring zero downtime and maintaining strict compute capacity requirements.
+This project goes beyond a simple script; it is a full **Multi-Mode Deployment** compliant repository, featuring a real-time visualization dashboard and robust programmatic grading.
 
 ## 🛠️ Core Mechanics
 
-The environment simulates a fleet of servers with varying CPU utilization, instance types, and monthly costs. The agent must make sequential decisions to move the cluster toward a budget goal.
+### 1. High-Fidelity Observation Space
+The agent perceives the true state of the infrastructure:
+- **Fleet Analytics**: Instance ID, Tier (t3/m5/c5), CPU Utilization, and monthly Cost.
+- **Constraints**: A global **Budget** and a **Minimum Capacity (vCPU)** floor that must never be breached.
 
-### Observation Space
-The agent receives a full snapshot of the cluster state:
-- **Server list**: ID, Instance Type (e.g., `m5.large`), CPU Utilization, and Operational Status.
-- **Constraints**: Monthly Budget ($) and Minimum Compute Capacity (vCPUs).
-
-### Action Space
-- `terminate`: Shut down an instance (Cost → $0, vCPU → 0).
-- `downsize`: Move an instance to the next smaller tier (e.g., `m5.xlarge` → `m5.large`).
-- `none`: Maintain current state.
+### 2. Strategic Action Space
+- `terminate`: Eradicate "Zombie" servers (0% CPU).
+- `downsize`: "Right-size" instances to the next smaller tier to eliminate waste.
+- `none`: Maintain current configuration.
 
 ---
 
-## 🎯 Task Definitions & Reward Shaping
+## 🎯 Task Tiers & Grading
 
-The environment includes three tiers of difficulty with programmatic graders that evaluate performance from `0.0` to `1.0`.
-
-| Task | Objective | Target | Reward Logic |
+| Difficulty | Task Name | Key Performance Indicator (KPI) | Score Range |
 | :--- | :--- | :--- | :--- |
-| **Easy** | Zombie Hunt | Terminate 0% CPU servers | Binary success for each zombie terminated. |
-| **Medium** | Right-Sizing | Downsize underutilized servers | Proportional reward based on reduction in waste. |
-| **Hard** | Cluster-Wide Optimization | Meet budget under constraints | Final score based on budget margin vs. capacity safety. |
+| **Easy** | Zombie Hunt | Termination of all 0% CPU servers. | `0.01 - 0.99` |
+| **Medium** | Right-Sizing | Mitigation of waste in servers with < 10% CPU. | `0.01 - 0.99` |
+| **Hard** | Fleet Optimization | Meet target budget while maintaining capacity. | `0.01 - 0.99` |
 
-**Reward Signal**: The environment provides a dense reward signal that penalizes "destructive" actions (terminating active servers) and rewards incremental cost savings.
-
----
-
-## 📊 Visual Dashboard
-
-This environment comes integrated with a **Real-Time Gradio Dashboard** (served at `/`). You can watch the agent's progress, trigger manual resets, and inspect individual server metrics through a high-fidelity web interface.
+> [!NOTE]
+> **Safety Clamping**: Following Phase 2 validation requirements, all scores are strictly clamped between `0.01` and `0.99` to ensure smooth agentic evaluation and transparent scoring.
 
 ---
 
-## 🚀 Getting Started
+## 🖥️ Live Visualization Dashboard
 
-### Local Setup
-Ensure you have a virtual environment activated:
+We have integrated a **Gradio-powered Control Center** directly into the environment. 
+- **Live Metrics**: Real-time cost and capacity counters.
+- **Visual Fleet Status**: Color-coded server status and CPU utilization bars.
+- **Direct App URL**: [https://huggingface.co/spaces/gyan0009/devops-agent-cost-optimizer](https://huggingface.co/spaces/gyan0009/devops-agent-cost-optimizer)
+
+---
+
+## 🚀 Usage Guide
+
+### 1. Local Development
 ```bash
-# 1. Activate venv
+python3 -m venv venv
 source venv/bin/activate
-
-# 2. Install dependencies
 pip install -r requirements.txt
 ```
 
-### Running the Environment
-The environment and dashboard run on a single FastAPI port:
+### 2. Run API & Dashboard
 ```bash
 uvicorn server.app:app --host 0.0.0.0 --port 7860
 ```
 
-### Running Baseline Inference
-The `inference.py` script includes a **Smart Fallback** mode that ensures the script runs successfully even if your OpenAI quota is exceeded.
+### 3. Run Inference Benchmark
 ```bash
-export HF_TOKEN="your_token_here"
+export HF_TOKEN="your_token"
 python inference.py
 ```
 
 ---
 
-## 🐳 Docker Deployment
-
-To build and run the containerized environment:
-```bash
-docker build -t cloud-optimizer .
-docker run -p 7860:7860 cloud-optimizer
-```
-
----
+## ⚖️ Compliance & Reproducibility
+- **OpenEnv Spec**: Full compliance with Pydantic models and `openenv.yaml`.
+- **Reproducibility**: Includes a **Mock Agent Fallback** to ensure consistent scores regardless of LLM quota limit.
+- **Containerization**: Optimized `Dockerfile` provided for seamless scaling.
 
 <div align="center">
-  <sub>Built for the OpenEnv Round 1 Hackathon.</sub>
+  <sub>Managed by Gyan Prakash for the Meta PyTorch Hackathon.</sub>
 </div>
