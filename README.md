@@ -10,88 +10,99 @@ tags:
   - openenv
 ---
 
-# OpenEnv: Cloud Infrastructure Cost Optimizer
+<div align="center">
+  <h1>☁️ Cloud Infrastructure Cost Optimizer</h1>
+  <p><b>An OpenEnv Reinforcement Learning Environment for DevOps Automation</b></p>
+  
+  <p>
+    <img src="https://img.shields.io/badge/OpenEnv-Compatible-green.svg" alt="OpenEnv Compatible">
+    <img src="https://img.shields.io/badge/Framework-FastAPI-009688.svg" alt="FastAPI">
+    <img src="https://img.shields.io/badge/Frontend-Gradio-ff5200.svg" alt="Gradio">
+    <img src="https://img.shields.io/badge/License-Apache--2.0-blue.svg" alt="License">
+  </p>
+</div>
 
-An environment designed for the OpenEnv Hackathon where an AI agent acts as a DevOps engineer to optimize a fleet of cloud servers. The environment returns real-world metrics like CPU utilization, instance types, and cost, challenging the agent to minimize cost while maintaining sufficient compute capacity.
+---
 
-## Environment Description
+## 📖 Overview
 
-This environment simulates a real-world DevOps task: cloud resource optimization. In modern infrastructure, "zombie" servers (0% CPU) and "underutilized" servers (<10% CPU) waste thousands of dollars. An agent must identify these servers and either terminate or downsize them to reach a budget goal without compromising the total compute capacity (vCPUs) required for the system to function.
+The **Cloud Infrastructure Cost Optimizer** is a real-world simulation environment designed for the OpenEnv Hackathon. It challenges AI agents to take on the role of a **SRE/DevOps Engineer** managing a large-scale cloud cluster. 
 
-## Observation Space
+In modern infrastructure, "Zombie" servers and over-provisioned instances cost companies billions. This environment provides a platform to train agents that can autonomously optimize infrastructure costs while ensuring zero downtime and maintaining strict compute capacity requirements.
 
-The `Observation` Pydantic model provides a list of `ServerState` objects.
-```json
-{
-  "servers": [
-    {
-      "server_id": "i-01234abcd",
-      "instance_type": "t3.medium",
-      "cpu_utilization": 0.5,
-      "cost_per_month": 30.0,
-      "status": "running",
-      "vcpu": 2
-    }
-  ],
-  "budget": 500.0,
-  "min_compute_capacity": 10
-}
+## 🛠️ Core Mechanics
+
+The environment simulates a fleet of servers with varying CPU utilization, instance types, and monthly costs. The agent must make sequential decisions to move the cluster toward a budget goal.
+
+### Observation Space
+The agent receives a full snapshot of the cluster state:
+- **Server list**: ID, Instance Type (e.g., `m5.large`), CPU Utilization, and Operational Status.
+- **Constraints**: Monthly Budget ($) and Minimum Compute Capacity (vCPUs).
+
+### Action Space
+- `terminate`: Shut down an instance (Cost → $0, vCPU → 0).
+- `downsize`: Move an instance to the next smaller tier (e.g., `m5.xlarge` → `m5.large`).
+- `none`: Maintain current state.
+
+---
+
+## 🎯 Task Definitions & Reward Shaping
+
+The environment includes three tiers of difficulty with programmatic graders that evaluate performance from `0.0` to `1.0`.
+
+| Task | Objective | Target | Reward Logic |
+| :--- | :--- | :--- | :--- |
+| **Easy** | Zombie Hunt | Terminate 0% CPU servers | Binary success for each zombie terminated. |
+| **Medium** | Right-Sizing | Downsize underutilized servers | Proportional reward based on reduction in waste. |
+| **Hard** | Cluster-Wide Optimization | Meet budget under constraints | Final score based on budget margin vs. capacity safety. |
+
+**Reward Signal**: The environment provides a dense reward signal that penalizes "destructive" actions (terminating active servers) and rewards incremental cost savings.
+
+---
+
+## 📊 Visual Dashboard
+
+This environment comes integrated with a **Real-Time Gradio Dashboard** (served at `/`). You can watch the agent's progress, trigger manual resets, and inspect individual server metrics through a high-fidelity web interface.
+
+---
+
+## 🚀 Getting Started
+
+### Local Setup
+Ensure you have a virtual environment activated:
+```bash
+# 1. Activate venv
+source venv/bin/activate
+
+# 2. Install dependencies
+pip install -r requirements.txt
 ```
 
-## Action Space
-
-The `Action` Pydantic model requires the agent to specify the server and the action.
-```json
-{
-  "server_id": "i-01234abcd",
-  "action_type": "terminate"
-}
+### Running the Environment
+The environment and dashboard run on a single FastAPI port:
+```bash
+uvicorn server.app:app --host 0.0.0.0 --port 7860
 ```
-*Options for `action_type`: "terminate", "downsize", "none"*
 
-## Tasks & Grading Logic
+### Running Baseline Inference
+The `inference.py` script includes a **Smart Fallback** mode that ensures the script runs successfully even if your OpenAI quota is exceeded.
+```bash
+export HF_TOKEN="your_token_here"
+python inference.py
+```
 
-### Easy: Terminate Zombie Servers
-- **Objective:** Find and terminate all servers with exactly 0% CPU utilization.
-- **Grader:** +1.0 for correctly terminating all zombies and none of the active servers.
+---
 
-### Medium: Downsize Underutilized Servers
-- **Objective:** Find instances running at <10% capacity and downsize them to a smaller instance tier.
-- **Grader:** +1.0 for correctly downsizing all <10% servers. Penalized if servers with >=10% CPU are modified.
+## 🐳 Docker Deployment
 
-### Hard: Complete Cluster Optimization
-- **Objective:** Optimize a mixed cluster to get total monthly cost under $500 while maintaining a minimum total compute capacity (10 vCPUs).
-- **Grader:** Score from 0.0 to 1.0 based on how well the budget is met without dropping below standard compute minimums.
+To build and run the containerized environment:
+```bash
+docker build -t cloud-optimizer .
+docker run -p 7860:7860 cloud-optimizer
+```
 
-## Baseline Scores
+---
 
-| Task | Score |
-| :--- | :--- |
-| Easy | 1.0 |
-| Medium | 1.0 |
-| Hard | 1.0 |
-
-## Setup & Running Locally
-
-1. **Virtual Environment**:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   ```
-
-2. **Run Environment & Dashboard**:
-   ```bash
-   uvicorn server.app:app --host 0.0.0.0 --port 7860
-   ```
-
-3. **Run Baseline Inference**:
-   ```bash
-   export HF_TOKEN="your_api_key_here"
-   python inference.py
-   ```
-
-## Deployment
-This project is ready for deployment as a Docker Space on Hugging Face.
-
-
+<div align="center">
+  <sub>Built for the OpenEnv Round 1 Hackathon.</sub>
+</div>
