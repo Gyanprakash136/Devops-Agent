@@ -1,0 +1,19 @@
+[project]
+name = "cloud_optimizer"
+version = "1.0.0"
+description = "Cloud Infrastructure Cost Optimizer Environment"
+authors = [{name = "Gyan Prakash", email = "gyan.official.work0902@gmail.com"}]
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "openai",
+    "openenv-core",
+]
+
+[project.scripts]
+server = "server.app:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

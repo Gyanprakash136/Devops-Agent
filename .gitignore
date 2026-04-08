@@ -39,6 +39,4 @@ ENV/
 
 # Project Specific
 .gemini/
-uv.lock
-pyproject.toml
 /Users/gyanprakash09/.gemini/antigravity/
