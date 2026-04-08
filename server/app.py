@@ -35,19 +35,13 @@ def state_env(task: str = "easy"):
     env = get_env(task)
     return env.state()
 
-from fastapi.responses import HTMLResponse
-
-@app.get("/")
-def home():
-    return HTMLResponse("<html><head><script>window.location.href='/dashboard';</script></head><body><p>Redirecting to dashboard...</p></body></html>")
-
 @app.get("/health")
 def health():
     return {"status": "healthy"}
 
-# Initialize and mount Gradio UI (Mounting at /dashboard to avoid shadowing /reset)
+# Initialize and mount Gradio UI - Mounting at root (/)
 ui = create_ui(envs)
-app = gr.mount_gradio_app(app, ui, path="/dashboard")
+app = gr.mount_gradio_app(app, ui, path="/")
 
 def main():
     uvicorn.run(app, host="0.0.0.0", port=7860)
