@@ -2,6 +2,7 @@ import uvicorn
 import gradio as gr
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from fastapi.responses import RedirectResponse
 from .environment import CloudOptimizerEnv, Action, Observation, Reward
 from .ui import create_ui
 
@@ -34,13 +35,17 @@ def state_env(task: str = "easy"):
     env = get_env(task)
     return env.state()
 
+@app.get("/")
+def home():
+    return RedirectResponse(url="/dashboard")
+
 @app.get("/health")
 def health():
     return {"status": "healthy"}
 
-# Initialize and mount Gradio UI (MUST BE LAST to avoid route shadowing)
+# Initialize and mount Gradio UI (Mounting at /dashboard to avoid shadowing /reset)
 ui = create_ui(envs)
-app = gr.mount_gradio_app(app, ui, path="/")
+app = gr.mount_gradio_app(app, ui, path="/dashboard")
 
 def main():
     uvicorn.run(app, host="0.0.0.0", port=7860)
