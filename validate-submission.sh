@@ -71,9 +71,6 @@ stop_at() {
 }
 
 printf "\n"
-printf "${BOLD}========================================${NC}\n"
-printf "${BOLD}  OpenEnv Submission Validator${NC}\n"
-printf "${BOLD}========================================${NC}\n"
 log "Repo:     $REPO_DIR"
 log "Ping URL: $PING_URL"
 printf "\n"
@@ -123,10 +120,7 @@ else
 fi
 
 printf "\n"
-printf "${BOLD}========================================${NC}\n"
-printf "${GREEN}${BOLD}  All 3/3 checks passed!${NC}\n"
-printf "${GREEN}${BOLD}  Your submission is ready to submit.${NC}\n"
-printf "${BOLD}========================================${NC}\n"
+printf "Validation complete. Passed: %d/3\n" "$PASS"
 printf "\n"
 
 exit 0
