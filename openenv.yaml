@@ -1,0 +1,20 @@
+benchmark_name: cloud_optimizer
+tasks:
+  - id: easy
+    name: "Terminate Zombie Servers"
+    description: "Find and terminate servers with 0% CPU utilization to save costs."
+    reward_range: [0.0, 1.0]
+  - id: medium
+    name: "Downsize Underutilized Servers"
+    description: "Downsize specific instances running at <10% capacity to a smaller instance tier."
+    reward_range: [0.0, 1.0]
+  - id: hard
+    name: "Complete Cluster Optimization"
+    description: "Optimize a mixed cluster to get total monthly cost under budget while maintaining minimum compute capacity."
+    reward_range: [0.0, 1.0]
+models:
+  observation: "environment:Observation"
+  action: "environment:Action"
+  reward: "environment:Reward"
+entrypoint: "server.app:app"
+version: "1.0.0"
