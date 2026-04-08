@@ -10,10 +10,6 @@ app = FastAPI(title="OpenEnv Cloud Infrastructure Cost Optimizer")
 # Global dict to store envs by task name (for simple statefulness if needed)
 envs = {}
 
-# Initialize and mount Gradio UI
-ui = create_ui(envs)
-app = gr.mount_gradio_app(app, ui, path="/")
-
 def get_env(task_name: str) -> CloudOptimizerEnv:
     if task_name not in envs:
         envs[task_name] = CloudOptimizerEnv(task_name=task_name)
@@ -41,6 +37,10 @@ def state_env(task: str = "easy"):
 @app.get("/health")
 def health():
     return {"status": "healthy"}
+
+# Initialize and mount Gradio UI (MUST BE LAST to avoid route shadowing)
+ui = create_ui(envs)
+app = gr.mount_gradio_app(app, ui, path="/")
 
 def main():
     uvicorn.run(app, host="0.0.0.0", port=7860)
