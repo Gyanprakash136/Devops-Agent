@@ -108,7 +108,7 @@ fi
 log "${BOLD}Step 3/3: Running openenv validate${NC} ..."
 
 VALIDATE_OK=false
-# Use the local venv openenv
+
 VALIDATE_OUTPUT=$($REPO_DIR/venv/bin/openenv validate 2>&1) && VALIDATE_OK=true
 
 if [ "$VALIDATE_OK" = true ]; then
