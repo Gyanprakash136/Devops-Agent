@@ -35,9 +35,11 @@ def state_env(task: str = "easy"):
     env = get_env(task)
     return env.state()
 
+from fastapi.responses import HTMLResponse
+
 @app.get("/")
 def home():
-    return RedirectResponse(url="/dashboard")
+    return HTMLResponse("<html><head><script>window.location.href='/dashboard';</script></head><body><p>Redirecting to dashboard...</p></body></html>")
 
 @app.get("/health")
 def health():
